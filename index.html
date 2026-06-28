@@ -469,27 +469,23 @@ async function saveOrder(order){
   try{
     const ref = await window._fbAddDoc(
       window._fbCollection(window._db, "pedidos"),
-      { ...order, createdAt: window._fbServerTimestamp() }
+      {
+        ...order,
+        createdAt: window._fbServerTimestamp()
+      }
     );
+
     _pendingDocId = ref.id;
-    console.log("Pedido guardado en Firestore:", ref.id);
+    console.log("Pedido guardado:", ref.id);
+
+    return ref.id;
   } catch(e){
     console.error("Error guardando pedido:", e);
+    alert("Error guardando el pedido: " + e.message);
+    return null;
   }
 }
 
-async function markOrderCompleted(orderId, transactionId){
-  try{
-    if(!_pendingDocId) return;
-    await window._fbUpdateDoc(
-      window._fbDoc(window._db, "pedidos", _pendingDocId),
-      { status: "completed", transactionId, completedAt: window._fbServerTimestamp() }
-    );
-    _pendingDocId = null;
-  } catch(e){
-    console.error("Error actualizando pedido:", e);
-  }
-}
 
 /* ──────────── CART ──────────── */
 function getCartTotal(){return cart.reduce((s,i)=>s+i.price*i.qty,0)}
